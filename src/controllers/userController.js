@@ -33,16 +33,32 @@ class UserController {
 
      async getUserbyId(req, res, next) {
          const { userId } = req.auth; 
-         if(!userId) return res.redirect('pages/signin')
+         if(!userId) return res.redirect('signin')
          const user = await findSingleUser({userId}); 
          req.user = user; 
          next(); 
      }
 
-     checkIsAdmin(req, res, next) {
-         if(req.isAdmin) return res.render('/layout'); 
-         return next()
-     }
+     async renderLoginPage  (req, res) {
+        const { expired } = req.query;
+        let error;
+
+        if (Number(expired) === 1) error = 'Session has expired. Login to continue';
+        const title = 'Authenticating';
+        const description = 'Free Hosting at for Everyone';
+        return res.render('signin', {
+          isAuth: req.isAuth,
+           isAdmin: req.auth.isAdmin,
+          meta: { title, description },
+          error
+        });
+      };
+
+     async checkRenderIsAuth  (req, res, next) {
+        if (req.isAuth) res.redirect('<h1>INVALID</h2>')
+        return next();
+
+      };
 
      async getUser(req, res) {
          const { username } = req.params; 

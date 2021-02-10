@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+</head>
+<body class="container">
+<header>
+    <link rel="stylesheet" href="/css/auth/signup/signup.css">
+    <link rel="stylesheet" href="/css/auth/signup/style.css.map">
+    <script src="https://apis.google.com/js/platform.js" async defer></script> 
+    <%- include('partials/header'); %> <!--  Write a logic here -->
+</header>
+
+<main>
+    <div class="container">
+        <%- include('partials/appAuthUI/signup'); %>
+       
+    </div> 
+    <footer>
+        <%- include('partials/appAuthUI/signupFooter'); %>
+    </footer>
+</main>
+    <%- include('partials/script'); %>
+</body>
+</html>

@@ -28,13 +28,14 @@ const passwordHash = require('../helpers/hash');
 
 class UserAuth {
     constructor() {}
+
     async signin(req, res) {
         const { password } = req.body; 
         const comparePassword = await comparedPasswords(password, req.body.password); 
-        if(!comparePassword) return respondwithWarning(res, 401, 'Incorrect Username and Password')
+        if(!comparePassword) respondwithWarning(res, 401, 'Incorrect Username and Password')
 
         const { userId, isAdmin } = req.user; 
-        const payload = { userId, isAdmin }; 
+        const payload = { userId, isAdmin}; 
 
         req.user.token = await generateToken(payload); 
         return respondWithSuccess(res, 200, 'Login Successfully', _.omit(req.user, ['password']))
@@ -48,32 +49,42 @@ class UserAuth {
         passwordHash(password)
     }
 
+    createGravatar(email) {
+        var st = `https://www.gravatar.com/avatar/${this.createHash(email)}?=identicon`; 
+        console.log(st)
+    }
+
     async signup(req, res) {
         const {username, email, password} = req.body; 
-
+        
         const _user = await createUser({
             username, 
             email, 
             password: this.hashPassword(password), 
+            profiieImg: this.createGravatar(email)
         })
-
+        
+        
         if(_user.success) {
             const payload = {
                 userId: _user.user.dataValues.userId,
                 isAdmin: _user.user.dataValues.isAdmin 
             }
 
+            console.log(payload)
+
             const token = await generateToken(payload);
             _user.user.dataValues.token = token; 
-
             const mailBody = newUserVerificationEmail(req.user.name, SITE_URL, token, req.body.email)
             const sendEmail = sendMail(req.body.email, 'ITARJ - Verify Email', mailBody);
             return respondWithSuccess(res, 200, 'User Succefully Created', _.omit(_user.user.dataValues, ['Password']))
         }
 
-        return respondWithWarning(res, 400, 'Error creating User :(');
+        respondWithWarning(res, 400, 'Error creating User :(');
+        
     }
 }
+
 
 
 module.exports = UserAuth
